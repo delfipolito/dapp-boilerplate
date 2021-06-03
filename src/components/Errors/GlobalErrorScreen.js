@@ -2,8 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, GU, useTheme, useViewport } from '@aragon/ui'
 import globalError from '../../assets/globalError.svg'
-import backgroundError from '../../assets/backgroundError.svg'
-import logo from '../../assets/logo.svg'
 
 function GlobalErrorScreen({ children }) {
   const theme = useTheme()
@@ -13,21 +11,12 @@ function GlobalErrorScreen({ children }) {
         height: 100vh;
         min-width: ${45 * GU}px;
         overflow: auto;
-        background: url(${backgroundError}),
-          linear-gradient(187.6deg, #fffaf1 -3.6%, #ffebeb 216.17%);
+        background: linear-gradient(187.6deg, #fffaf1 -3.6%, #ffebeb 216.17%);
         border-top-style: solid;
         border-top-width: 4px;
         border-top-color: ${theme.accent};
       `}
     >
-      <img
-        css={`
-          position: absolute;
-          top: ${2 * GU}px;
-          left: ${2 * GU}px;
-        `}
-        src={logo}
-      />
       <div
         css={`
           display: flex;

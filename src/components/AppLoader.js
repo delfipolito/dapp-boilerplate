@@ -1,13 +1,10 @@
 import React from 'react'
-import { SyncIndicator } from '@aragon/ui'
-import { useCourtConfig } from '../providers/CourtConfig'
+// import { SyncIndicator } from '@aragon/ui'
 
 function AppLoader({ children }) {
-  const courtConfig = useCourtConfig()
-
-  if (!courtConfig) {
-    return <SyncIndicator visible label="Loading court…" /> // TODO: Add better loader
-  }
+  // if (nodata) {
+  //   return <SyncIndicator visible label="Loading…" />
+  // }
 
   return <React.Fragment>{children}</React.Fragment>
 }

@@ -1,16 +1,9 @@
 import React from 'react'
 import { ButtonIcon, GU, IconMenu } from '@aragon/ui'
 import AccountModule from '../Account/AccountModule'
-import ClockModule from '../ClockModule'
-import ActivityButton from '../Activity/ActivityButton'
-import GlobalPreferencesButton from '../GlobalPreferences/GlobalPreferencesButton'
 import HeaderLogo from './HeaderLogo'
 
-const Header = React.memo(function Header({
-  compactMode,
-  toggleMenuPanel,
-  onOpenPreferences,
-}) {
+const Header = React.memo(function Header({ compactMode }) {
   return (
     <header
       css={`
@@ -30,11 +23,11 @@ const Header = React.memo(function Header({
           display: flex;
           align-items: center;
           height: 100%;
-          padding-left: ${3 * GU}px;
+          padding: 0 ${3 * GU}px;
         `}
       >
         {compactMode ? (
-          <ButtonIcon label="Open menu" onClick={toggleMenuPanel}>
+          <ButtonIcon label="Open menu">
             <IconMenu />
           </ButtonIcon>
         ) : (
@@ -47,9 +40,9 @@ const Header = React.memo(function Header({
           flex-grow: 0;
           display: flex;
           height: 100%;
+          padding: 0 ${3 * GU}px;
         `}
       >
-        {!compactMode && <ClockModule />}
         <div
           css={`
             display: flex;
@@ -57,23 +50,6 @@ const Header = React.memo(function Header({
           `}
         >
           <AccountModule />
-        </div>
-        <div
-          css={`
-            display: flex;
-            height: 100%;
-            margin-left: ${2 * GU}px;
-          `}
-        >
-          <GlobalPreferencesButton onOpen={onOpenPreferences} />
-        </div>
-        <div
-          css={`
-            display: flex;
-            height: 100%;
-          `}
-        >
-          <ActivityButton />
         </div>
       </div>
     </header>

@@ -26,7 +26,7 @@ function HeaderLogo() {
           ${textStyle('body1')};
         `}
       >
-        Aragon Court
+        Boilerplate
       </h1>
     </div>
   )

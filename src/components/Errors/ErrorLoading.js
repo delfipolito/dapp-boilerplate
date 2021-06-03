@@ -2,7 +2,7 @@ import React from 'react'
 import { GU, Info, useTheme } from '@aragon/ui'
 
 import errorLoadingSvg from '../../assets/errorLoading.svg'
-import MessageCard from '../MessageCard'
+import MessageCard from './MessageCard'
 
 function ErrorLoading({ subject, errors, border }) {
   const theme = useTheme()

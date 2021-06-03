@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { GU, Link, textStyle, useTheme } from '@aragon/ui'
 import { ChainUnsupportedError } from 'use-wallet'
 import { getNetworkName } from '../../lib/web3-utils'
-import connectionError from './assets/connection-error.png'
 
 function AccountModuleErrorScreen({ error, onBack }) {
   const theme = useTheme()
@@ -44,14 +43,6 @@ function AccountModuleErrorScreen({ error, onBack }) {
           text-align: center;
         `}
       >
-        <div
-          css={`
-            position: relative;
-            width: 281px;
-            height: 188px;
-            background: 50% 50% / 100% 100% no-repeat url(${connectionError});
-          `}
-        />
         <h1
           css={`
             padding-top: ${2 * GU}px;
