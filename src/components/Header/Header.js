@@ -10,7 +10,7 @@ const Header = React.memo(function Header({ compactMode }) {
         position: relative;
         z-index: 3;
         height: ${8 * GU}px;
-        background: #fff;
+        background: white;
         box-shadow: rgba(0, 0, 0, 0.05) 0 2px 3px;
         display: flex;
         align-items: center;

@@ -1,4 +1,4 @@
-import env from '../environment'
+import env from '../environments/variables'
 import { providers as Providers } from 'ethers'
 import { solidityKeccak256, id as keccak256 } from 'ethers/utils'
 import { InvalidURI, InvalidNetworkType, NoConnection } from '../errors'

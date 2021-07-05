@@ -1,12 +1,13 @@
 import React from 'react'
 import Welcome from './Welcome'
-import { useWallet } from '../../providers/Wallet'
+import TopCountries from './TopCountries'
 
 function Dashboard() {
-  const wallet = useWallet()
-
   return (
-    <React.Fragment>{wallet.account ? 'delfi' : <Welcome />}</React.Fragment>
+    <>
+      <Welcome />
+      <TopCountries />
+    </>
   )
 }
 

@@ -1,19 +1,9 @@
 import React from 'react'
-import {
-  GU,
-  Layout,
-  Link,
-  Root,
-  ScrollView,
-  textStyle,
-  useTheme,
-  useViewport,
-} from '@aragon/ui'
+import { Layout, Root, ScrollView, useViewport } from '@aragon/ui'
 import Header from './Header/Header'
 
 function MainView({ children }) {
   const { width: vw, below } = useViewport()
-  const theme = useTheme()
   const compactMode = below('medium')
 
   return (
@@ -66,18 +56,6 @@ function MainView({ children }) {
                   {children}
                 </Layout>
               </div>
-              <footer
-                css={`
-                  flex-shrink: 0;
-                  margin-bottom: ${5 * GU}px;
-                  width: 100%;
-                  text-align: center;
-                  ${textStyle('body2')};
-                  color: ${theme.surfaceContentSecondary};
-                `}
-              >
-                Footer & <Link href="https://aragon.one"> footer link</Link>.
-              </footer>
             </div>
           </ScrollView>
         </Root.Provider>

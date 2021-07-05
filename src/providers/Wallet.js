@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react'
 import { providers as EthersProviders } from 'ethers'
 import { UseWalletProvider, useWallet } from 'use-wallet'
 import { getUseWalletConnectors } from '../lib/web3-utils'
-import env from '../environment'
+import env from '../environments/variables'
 
 const WalletAugmentedContext = React.createContext()
 

@@ -100,6 +100,7 @@ function AccountModule() {
           label="Connect account"
           onClick={toggle}
           display={compactMode ? 'icon' : 'all'}
+          mode="strong"
         />
       )}
       <AccountPopover

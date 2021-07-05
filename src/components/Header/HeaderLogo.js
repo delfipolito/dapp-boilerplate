@@ -1,33 +1,33 @@
-import React from 'react'
-import { GU, textStyle } from '@aragon/ui'
+import React, { useCallback } from 'react'
+import { GU } from '@aragon/ui'
 import headerLogoSvg from '../../assets/HeaderLogo.svg'
+import { useHistory } from 'react-router-dom'
 
 function HeaderLogo() {
+  const history = useHistory()
+  const handleClick = useCallback(
+    id => {
+      history.push(`/`)
+    },
+    [history]
+  )
   return (
     <div
       css={`
         display: flex;
         align-items: center;
+        cursor: pointer;
       `}
+      onClick={handleClick}
     >
       <img
         alt=""
         src={headerLogoSvg}
-        width={4 * GU}
+        width={128}
         css={`
           margin-right: ${1 * GU}px;
         `}
       />
-      <h1
-        css={`
-          display: flex;
-          height: 100%;
-          align-items: center;
-          ${textStyle('body1')};
-        `}
-      >
-        Boilerplate
-      </h1>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import env from './environment'
+import env from './environments/variables'
 
 const DEFAULT_ETH_NODE = 'DEFAULT_ETH_NODE'
 const PACKAGE_VERSION = 'PACKAGE_VERSION'

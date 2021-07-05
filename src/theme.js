@@ -3,19 +3,25 @@ export default {
   _appearance: 'light',
 
   accent: '#FF9780',
-  accentStart: '#FFB36D',
-  accentEnd: '#FF8888',
-  accentContent: '#FFFFFF',
+  accentStart: '#00AFFF',
+  accentEnd: '#00AFFF',
 
-  selected: '#FF9780',
-  selectedContent: '#FFFFFF',
-  selectedDisabled: '#C4CDD5',
+  background: '#f6f6f6',
+  border: '#e6e5e5',
+  overlay: '#fff',
+  content: '#211748',
+  contentSecondary: '#0140f6',
 
-  tagIndicator: '#FFF5F1',
-  tagIndicatorContent: '#CD625C',
+  surface: '#fff',
+  surfaceContent: '#211748',
+  surfaceContentSecondary: '#0140f6',
 
-  tagActivity: '#FF9780',
-  tagActivityContent: '#FFFFFF',
-
-  surfaceOpened: '#FF8D86',
+  link: '#00AFFF',
+  surfaceIcon: '#6683c3',
+  surfaceUnder: '#2d3954',
+  surfaceOpened: '#7c99d6',
+  surfaceSelected: '#fff',
+  surfaceHighlight: '#fff',
+  surfacePressed: '#3fe0ae',
+  surfaceInteractive: '#fff',
 }
