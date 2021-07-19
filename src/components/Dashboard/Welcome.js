@@ -1,14 +1,17 @@
 import React from 'react'
 import { GU, textStyle, Card, CardLayout } from '@aragon/ui'
-import tvl from '../../assets/tvl.svg'
-import marketCap from '../../assets/marketCap.svg'
-import tradingVolume from '../../assets/tradingVolume.svg'
-import tokenPrice from '../../assets/tokenPrice.svg'
-import { useNumTokenPrice } from '../../hooks/useCountry'
+import tvlImage from '../../assets/tvl.svg'
+import marketCapImage from '../../assets/marketCap.svg'
+import tradingVolumeImage from '../../assets/tradingVolume.svg'
+import tokenPriceImage from '../../assets/tokenPrice.svg'
+import { useNumTokenPrice, useTvl, useTradingVolume, useMarketCap } from '../../hooks/useCountry'
 
 function Welcome() {
   const numTokenPrice = useNumTokenPrice()
-  console.log("NUM", numTokenPrice)
+  const tvl = useTvl()
+  const tradingVolume = useTradingVolume()
+  const marketCap = useMarketCap()
+  console.log("WELCOME", numTokenPrice, tvl)
   return (
     <div
       css={`
@@ -23,7 +26,7 @@ function Welcome() {
         >
           <img
             alt=""
-            src={tvl}
+            src={tvlImage}
             css={`
               height: 40px;
               margin-bottom: 10px;
@@ -43,7 +46,7 @@ function Welcome() {
               ${textStyle('body2')}
             `}
           >
-            $905.028.756
+            {tvl ? '$ ' + tvl : '-'}
           </div>
         </Card>
         <Card
@@ -53,7 +56,7 @@ function Welcome() {
         >
           <img
             alt=""
-            src={tradingVolume}
+            src={tradingVolumeImage}
             css={`
               height: 40px;
               margin-bottom: 10px;
@@ -73,7 +76,7 @@ function Welcome() {
               ${textStyle('body2')}
             `}
           >
-            $150.555.094
+            {tradingVolume ? '$ ' + tradingVolume : '-'}
           </div>
         </Card>
         <Card
@@ -83,7 +86,7 @@ function Welcome() {
         >
           <img
             alt=""
-            src={tokenPrice}
+            src={tokenPriceImage}
             css={`
               height: 40px;
               margin-bottom: 10px;
@@ -103,7 +106,7 @@ function Welcome() {
               ${textStyle('body2')}
             `}
           >
-            $0.91
+            {numTokenPrice ? '$ ' + numTokenPrice : '-'}
           </div>
         </Card>
         <Card
@@ -113,7 +116,7 @@ function Welcome() {
         >
           <img
             alt=""
-            src={marketCap}
+            src={marketCapImage}
             css={`
               height: 40px;
               margin-bottom: 10px;
@@ -133,7 +136,7 @@ function Welcome() {
               ${textStyle('body2')}
             `}
           >
-            $910.080.990
+            {marketCap ? '$ ' + marketCap : '-'}
           </div>
         </Card>
       </CardLayout>

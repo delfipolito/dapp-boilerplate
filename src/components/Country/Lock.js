@@ -18,12 +18,6 @@ function Lock() {
     }
   }, [])
 
-  const handleRadioChange = useCallback(id => {
-    setActiveId(id)
-  }, [])
-
-  const intervals = [1, 3, 6, 12]
-
   return (
     <Box>
       <div
@@ -39,37 +33,18 @@ function Lock() {
         onChange={handleAmountChange}
         placeholder="Enter amount to lock"
       />
-      <RadioGroup
-        onChange={handleRadioChange}
-        selected={activeId}
+
+      <Button
+        label="Lock"
+        mode="strong"
+        href=""
+        target="_blank"
         css={`
-          display: flex;
-          flex-wrap: wrap;
-          gap: 25px;
-          margin: 10px 0 20px 0;
+          margin-top: 20px;
         `}
-      >
-        {intervals.map(item => (
-          <Item key={item}>
-            <Radio id={String(item)} />
-            {item} {item === 1 ? 'month' : 'months'}
-          </Item>
-        ))}
-      </RadioGroup>
-      <Button label="Lock" mode="strong" href="" target="_blank" />
+      />
     </Box>
   )
 }
-
-const Item = styled.label`
-  display: flex;
-  align-items: center;
-  height: 40px;
-  cursor: pointer;
-  color: #000;
-  &:active {
-    color: #666;
-  }
-`
 
 export default Lock

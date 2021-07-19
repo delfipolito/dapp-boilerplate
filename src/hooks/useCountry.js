@@ -1,11 +1,13 @@
 import { useCallback, useState } from 'react'
 import { useWallet } from 'use-wallet'
+import { useWallet as useWallet2 } from '../providers/Wallet'
+import { Contract as EthersContract } from 'ethers'
 import { useMounted } from './useMounted'
 import { useContract } from '../web3-contracts'
 import { useInterval } from './useInterval'
 import { bigNum, formatUnits } from '../lib/math-utils'
 import enviromentAddresses from '../environments/addresses'
-
+import environmentCountries from '../environments/countries'
 
 import tokenAbi from '../abi/token.json'
 import stakingAbi from '../abi/staking.json'
@@ -13,72 +15,35 @@ import iUniswapV2Router01Abi from '../abi/IUniswapV2Router01.json'
 import iUniswapV2FactoryAbi from '../abi/IUniswapV2Factory.json'
 import iUniswapV2PairAbi from '../abi/IUniswapV2Pair.json'
 
-import argentina from '../assets/argentina.svg'
-import brazil from '../assets/brazil.svg'
-import mexico from '../assets/mexico.svg'
-
 const SECONDS_IN_A_YEAR = 31556952
 
-const countries = [
-  {
-    id: 'Argentina',
-    name: 'Argentina',
-    flag: argentina,
-    top: true,
-    apy: '154%',
-    tokenReward: '40.000 num/week',
-    fees: '$230.040/week',
-    totalLiquidity: '349.080.555 USD',
-  },
-  {
-    id: 'Brazil',
-    name: 'Brazil',
-    flag: brazil,
-    top: true,
-    apy: '120%', //rewardRate() multiplicar por 31556952 (seconds in a year) => pools en un año
-    tokenReward: '80.000 num/week', //staking abi, multiplicar por 604800, rewardRate() y dsp dividir por 1e18
-    fees: '$200.100/week', // 0.3% en todos
-    totalLiquidity: '452.080.555 USD',
-  },
-  {
-    id: 'Mexico',
-    name: 'Mexico',
-    top: true,
-    flag: mexico,
-    apy: '34%',
-    tokenReward: '20.000 num/week',
-    fees: '$30.040/week',
-    totalLiquidity: '9.080.555 USD',
-  },
-]
-
-function getStakingAddress(id) {
+export function getCountryAddress(id) {
   const { networkName } = useWallet()
-  return enviromentAddresses[networkName.toLowerCase()][id.toLowerCase()].staking
+  return enviromentAddresses[networkName.toLowerCase()][id.toLowerCase()]
 }
 
-function getNumAddress() {
+function getAddress() {
   const { networkName } = useWallet()
-  return enviromentAddresses[networkName.toLowerCase()].manager
+  return enviromentAddresses[networkName.toLowerCase()]
 }
 
-function getDaiAddress() {
-  const { networkName } = useWallet()
-  return enviromentAddresses[networkName.toLowerCase()].dai
+export function useCountryBasicInfo(id, account) {
+  return environmentCountries.filter(function(item) {
+    return item.id === id
+  })[0]
 }
 
 export function useCountryDetails(id) {
-  const stakingContract = useContract(
-    getStakingAddress(id),
-    stakingAbi
-  )
+  const stakingContract = useContract(getCountryAddress(id).staking, stakingAbi)
+  const tokenContract = useContract(getCountryAddress(id).token, tokenAbi)
   const [rewardRate, setRewardRate] = useState(null)
+  const [totalSupply, setTotalSupply] = useState(null)
 
   const mounted = useMounted()
 
   const getRewardRate = useCallback(
     async clear => {
-      if (!stakingContract) {
+      if (!stakingContract || !tokenContract) {
         // Clear any existing balance
         if (mounted()) {
           setRewardRate(null)
@@ -88,9 +53,15 @@ export function useCountryDetails(id) {
 
       try {
         const reward = await stakingContract.rewardRate()
+        const supply = await tokenContract.totalSupply()
+        console.log('ssuply', supply, tokenContract)
+
+        if (mounted() && (!totalSupply || supply.eq(totalSupply))) {
+          setTotalSupply(supply)
+        }
         // Avoid unnessesary re-renders by only updating value when it has actually changed
         if (mounted() && (!rewardRate || !reward.eq(rewardRate))) {
-          console.log("success", id)
+          console.log('success', id)
           setRewardRate(reward)
         }
       } catch (err) {
@@ -114,119 +85,22 @@ export function useCountryDetails(id) {
 
   return {
     tokenReward: formatUnits(tokenReward),
-    apy: formatUnits(apy),
-    fees: '0.3',
-    totalLiquidity: '-',
+    apy: 'X%', //TODO: change this value to real one
+    fees: '0.3%',
+    totalLiquidity: formatUnits(totalSupply), // multiplicar totalSupply por tokenValue.
   }
-}
-
-export function useRewardRate(id, account) {
-  const stakingContract = useContract(
-    '0xC17653432553Ab1199d0e0128E2451e632477b06', //staking address de arg, cambiar por variable de cada pais
-    stakingAbi
-  )
-  const [status, setStatus] = useState('noAccount')
-  const [tokenReward, setTokenReward] = useState(null)
-
-  const mounted = useMounted()
-
-  const getTokenReward = useCallback(
-    async clear => {
-      if (!stakingContract) {
-        // Clear any existing balance
-        if (mounted()) {
-          setTokenReward(null)
-        }
-        return
-      }
-
-      try {
-        const reward = await stakingContract.rewardRate()
-        console.log('tr', reward)
-        setTokenReward(reward)
-        // Avoid unnessesary re-renders by only updating value when it has actually changed
-        if (mounted() && (!tokenReward || !reward.eq(tokenReward))) {
-          setStatus('success')
-        }
-      } catch (err) {
-        if (mounted()) {
-          setStatus('error')
-          console.log('error', err)
-        }
-        clear()
-      }
-    },
-    [mounted, stakingContract, tokenReward]
-  )
-
-  useInterval(getTokenReward, 5000)
-
-  if (tokenReward === null) {
-    return
-  }
-
-  return tokenReward
-}
-
-export function useCountry(id, account) {
-  const poolTokenContract = useContract(
-    '0x8c0a4a68DAF8249737eC232328128CE0167e7365',
-    tokenAbi
-  )
-  console.log(account, poolTokenContract)
-  const [tokenBalance, setTokenBalance] = useState(null)
-  const [status, setStatus] = useState('noAccount')
-
-  console.log('S', status, tokenBalance)
-
-  const mounted = useMounted()
-
-  const getBalance = useCallback(
-    async clear => {
-      console.log('getBalance function')
-      if (!poolTokenContract || !account) {
-        // Clear any existing balance
-        if (mounted()) {
-          setStatus('noAccount')
-          setTokenBalance(null)
-        }
-        return countries.filter(function(item) {
-          return item.id === id
-        })[0]
-      }
-
-      try {
-        // if (!tokenBalance && mounted()) {
-        //   setStatus('loading')
-        // }
-
-        const balance = await poolTokenContract.balanceOf(account)
-        console.log('balance', balance)
-        setTokenBalance(balance)
-        // Avoid unnessesary re-renders by only updating value when it has actually changed
-        if (mounted() && (!tokenBalance || !balance.eq(tokenBalance))) {
-          setStatus('success')
-        }
-      } catch (err) {
-        if (mounted()) {
-          setStatus('error')
-          console.log('error', err)
-        }
-        clear()
-      }
-    },
-    [account, mounted, poolTokenContract, tokenBalance]
-  )
-
-  useInterval(getBalance, 5000)
-  console.log('fin', status, tokenBalance)
-  return countries.filter(function(item) {
-    return item.id === id
-  })[0]
 }
 
 export function useNumTokenPrice() {
-  const uniswapContract = useContract(uniswapAddress, iUniswapV2Router01Abi)
+  const { account, ethers } = useWallet2()
+
+  const num = getAddress().num
+  const dai = getAddress().dai
+  const uniswap = getAddress().uniswap
+
+  const uniswapContract = ethers
+    ? new EthersContract(uniswap, iUniswapV2Router01Abi, ethers.getSigner())
+    : null
 
   const [numTokenPrice, setNumTokenPrice] = useState(null)
 
@@ -235,7 +109,6 @@ export function useNumTokenPrice() {
   const getNum = useCallback(
     async clear => {
       if (!uniswapContract) {
-        // Clear any existing balance
         if (mounted()) {
           setNumTokenPrice(null)
         }
@@ -244,24 +117,32 @@ export function useNumTokenPrice() {
 
       try {
         const factoryAddress = await uniswapContract.factory()
-        console.log("factory", factoryAddress)
-        const factoryContract = await useContract(factoryAddress, iUniswapV2FactoryAbi)
-        const poolAddress = await factoryContract.getPair(getNumAddress(), getDaiAddress())
-        const poolContract = await useContract(poolAddress, iUniswapV2PairAbi)
+        const factoryContract = await new EthersContract(
+          factoryAddress,
+          iUniswapV2FactoryAbi,
+          ethers.getSigner()
+        )
+        const poolAddress = await factoryContract.getPair(num, dai)
+        const poolContract = await new EthersContract(
+          poolAddress,
+          iUniswapV2PairAbi,
+          ethers.getSigner()
+        )
 
         const [reserve0, reserve1] = await poolContract.getReserves()
-        const [numReserve, daiReserve] = numAddress < daiAddress ? [reserve0, reserve1] : [reserve1, reserve0]
-        const numPrice = numReserve.div(daiReserve)
+        if (reserve0 === bigNum(0) || reserve1 === bigNum(0)) {
+          setNumTokenPrice(bigNum(0))
+        } else {
+          const [numReserve, daiReserve] =
+            num < dai ? [reserve0, reserve1] : [reserve1, reserve0]
+          const numPrice = numReserve.div(daiReserve)
 
-
-        // Avoid unnessesary re-renders by only updating value when it has actually changed
-        if (mounted() && (!numTokenPrice || !numPrice.eq(numTokenPrice))) {
-          setNumTokenPrice(numPrice)
+          if (mounted() && (!numTokenPrice || !numPrice.eq(numTokenPrice))) {
+            setNumTokenPrice(numPrice)
+          }
         }
       } catch (err) {
-        if (mounted()) {
-          console.log('error', err)
-        }
+        console.log('error', err)
         clear()
       }
     },
@@ -277,29 +158,99 @@ export function useNumTokenPrice() {
   return numTokenPrice
 }
 
-// //numtokenprice
-// function numPrice(uniswapAddress, numAddress, daiAddress) {
-//   const uniswap = useContract('IUniswapV2Router01', uniswapAddress)
-//   const factory = await useContract('IUniswapV2Factory', await uniswap.factory())
-//   const pool = await useContract('IUniswapV2Pair.sol', await factory.getPair(numAddress, daiAddress))
-//
-//   const [reserve0, reserve1] = await pool.getReserves()
-//   const [numReserve, daiReserve] = numAddress < daiAddress ? [reserve0, reserve1] : [reserve1, reserve0]
-//   return numReserve.div(daiReserve)
+export function useTvl() {
+  const { account, ethers } = useWallet2()
+  const mounted = useMounted()
+
+  const countriesIds = ['argentina', 'brazil', 'mexico']
+  const stakingAddresses = countriesIds.map(countryId => {
+    return getCountryAddress(countryId).staking
+  })
+
+  console.log('st', stakingAddresses)
+
+  const [tvl, setTvl] = useState(null)
+
+  const getTvl = useCallback(
+    async clear => {
+      if (!account && !ethers) {
+        if (mounted()) {
+          setTvl(null)
+        }
+        return
+      }
+
+      try {
+        const totalSupplies = await Promise.all(
+          stakingAddresses.map(async address => {
+            const staking = new EthersContract(
+              address,
+              stakingAbi,
+              ethers.getSigner()
+            )
+            return staking.totalSupply()
+          })
+        )
+
+        const locked = formatUnits(
+          totalSupplies.reduce((total, supply) => total.add(supply), bigNum(0))
+        )
+
+        if (mounted() && (!tvl || locked !== tvl)) {
+          setTvl(locked)
+        }
+      } catch (err) {
+        console.log('error', err)
+        clear()
+      }
+    },
+    [mounted, stakingAddresses, tvl]
+  )
+
+  useInterval(getTvl, 5000)
+
+  if (tvl === null) {
+    return
+  }
+
+  return tvl
+}
+
+//TODO: Calculate real one
+export function useTradingVolume() {
+  return 'X'
+}
+
+//TODO: Calculate real one
+// sumar los total liquidity de todos los paises
+export function useMarketCap() {
+  return 'X'
+}
+// 
+// function useLiquidityDeposits(managerAddress, daiAddress, tokenAddress, userAddress) {
+//   const manager = useContract('LockManager', managerAddress)
+//   const { foreignLocked } = manager.getDeposit(daiAddress, tokenAddress, userAddress);
+//   return foreignLocked
 // }
 //
-// //APY
-// function apy(stakingAddress) {
-//   const staking = useContract(StakingABI, stakingAddress)
-//   const rewardsPerSecond = await staking.rewardsRate()
-//   const rewardsPerYear = rewardsPerSecond.mul(31556952)
-//
-//   const totalSupply = await staking.totalSupply()
-//   const rewardsPerYearPerToken = rewardsPerYear.div(totalSupply)
-//   return rewardsPerYearPerToken.mul(100)
+// async function numRewards(managerAddress, daiAddress, tokenAddress, userAddress, numPrice) {
+//   const manager = useContract('LockManager', managerAddress)
+//   const rewards = manager.getEarned(daiAddress, tokenAddress, userAddress);
+//   return rewards.mul(numPrice).div(1e18);
 // }
 //
+// async function availableDAI(daiAddress, userAddress) {
+//   const dai = useContract('ERC20', daiAddress)
+//   return dai.balanceOf(userAddress)
+// }
 //
+// async function availableLPT(poolAddress, userAddress) {
+//   const pool = useContract('ERC20', poolAddress)
+//   return pool.balanceOf(userAddress)
+// }
+
+// token reward: //staking abi, multiplicar por 604800, rewardRate() y dsp dividir por 1e18
+
 // //Token price
 //
 // function tokenPrice(uniswapAddress, tokenAddress, daiAddress) {
@@ -313,25 +264,3 @@ export function useNumTokenPrice() {
 // }
 //
 //
-// //totalLiquidity
-// function totalLiquidity(tokenAddress, tokenPrice) {
-//   const token = useContract('Token', tokenAddress)
-//   const totalSupply = await token.totalSupply()
-//   return totalSupply.mul(tokenPrice).div(1e18)
-// }
-//
-//
-//
-// //market cap sumar los total liquidity de todos los paises
-//
-//
-// //tvl
-// function tvl(stakingAddresses) {
-//   const totalSupplies = await Promise.all(stakingAddresses.map(stakingAddress => {
-//     const staking = useContract(StakingABI, stakingAddress)
-//     return staking.totalSupply()
-//   }))
-//
-//   const locked = totalSupplies.reduce((total, supply) => total.add(supply), BigNumber.from(0))
-//   return locked.div(1e18)
-// }

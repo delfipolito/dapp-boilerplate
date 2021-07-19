@@ -5,16 +5,16 @@ import Lock from './Lock'
 import Boost from './Boost'
 import Stake from './Stake'
 import SplitHalf from '../SplitHalf'
-import { useCountry, useCountryDetails } from '../../hooks/useCountry'
+import { useCountryBasicInfo, useCountryDetails, getCountryAddress } from '../../hooks/useCountry'
 import { useWallet } from 'use-wallet'
 
 const CountryDetail = React.memo(function CountryDetail({ match }) {
   const { id: countryId } = match.params
   const { account } = useWallet()
-  const country = useCountry(countryId, account)
+  const country = useCountryBasicInfo(countryId, account)
+  const countryAddress = getCountryAddress(countryId).pool
 
   const countryDetail = useCountryDetails(countryId)
-  console.log("useCountryDetails", countryDetail)
 
   return (
     <>
@@ -30,7 +30,7 @@ const CountryDetail = React.memo(function CountryDetail({ match }) {
             <Button
               label="View uni pool"
               mode="strong"
-              href=""
+              href={"https://v2.info.uniswap.org/pair/" + countryAddress }
               target="_blank"
             />
           </div>

@@ -2,8 +2,10 @@ const ENVIROMENT_ADDRESSES =  {
   mainnet: undefined,
   ropsten: undefined,
   rinkeby: {
+    uniswap: '0xf164fC0Ec4E93095b804a4795bBe1e041497b92a',
     manager: '0xDAFEf012CD5557b7B169Be5939A9db219D77dC70',
     dai: '0x8c0a4a68DAF8249737eC232328128CE0167e7365',
+    num: '0xb0D58DFFa322D68C45fca59263524F9011f93985',
     argentina: {
       token: '0xeEbAe4989010bEa088Fce7e017756bf7aF223282',
       pool: '0x73dcB32D8dC3FE91d7E3c1bd6dB38878c47C668E',
